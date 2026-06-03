@@ -1,0 +1,12 @@
+{
+  "name": "plc-tia",
+  "version": "0.1.0",
+  "description": "Generate and manipulate Siemens TIA Portal projects via the Openness API and PowerShell 5.1: connect/read/export, clone hardware devices, and scaffold standard + safety (F) block chains. Documented skeleton built from proven recipes; refine against a real project before production use.",
+  "author": "plc-tia",
+  "skills": [
+    "skills/plc-connect",
+    "skills/plc-device-clone",
+    "skills/plc-fb-scaffold",
+    "skills/plc-knowledge"
+  ]
+}

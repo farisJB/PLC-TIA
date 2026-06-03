@@ -1,0 +1,12 @@
+# Never commit real project artifacts (plant/device names, IPs, GSD strings)
+*.aml
+*.zw1
+*.zip
+*.pdf
+*.xlsx
+*.scl
+*_log.txt
+*.log
+export/
+device_library/
+TIA Library/
