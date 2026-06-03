@@ -1,0 +1,14 @@
+{
+  "name": "faris-plugins",
+  "owner": {
+    "name": "FArisJB"
+  },
+  "plugins": [
+    {
+      "name": "plc-tia",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "A reusable toolkit for driving Siemens TIA Portal V17 through the Openness API from Windows PowerShell 5.1 — connect/read/export, hardware device cloning, and standard + safety (F) block scaffolding."
+    }
+  ]
+}
