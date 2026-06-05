@@ -7,7 +7,8 @@
 $TiaVersion   = "<VER>"                                  # e.g. 17
 $ExportFolder = "<ABSOLUTE\EXPORT\FOLDER>"               # where XML/AML go
 $LogFile      = Join-Path $ExportFolder "connect_log.txt"
-$DllPath      = "C:\Program Files\Siemens\Automation\Portal V$TiaVersion\PublicAPI\V$TiaVersion\Siemens.Engineering.dll"
+$ApiDir       = "C:\Program Files\Siemens\Automation\Portal V$TiaVersion\PublicAPI\V$TiaVersion"
+$DllPath      = Join-Path $ApiDir "Siemens.Engineering.dll"
 # -----------------------------------------------------------------------------
 
 function Log($m){ $line="{0}  {1}" -f (Get-Date -Format "HH:mm:ss"), $m; $line; Add-Content -Path $LogFile -Value $line }
@@ -15,21 +16,34 @@ if(-not (Test-Path $ExportFolder)){ New-Item -ItemType Directory -Path $ExportFo
 "" | Set-Content $LogFile
 Log "START connect_read_export"
 
-# 1) Compiled C# assembly resolver (a scriptblock resolver StackOverflows on Attach)
+# 1) Compiled C# assembly resolver (a scriptblock resolver StackOverflows on Attach).
+#    It MUST resolve EACH requested Siemens.* assembly by its own name from the
+#    PublicAPI folder (e.g. Siemens.Engineering.Contract.dll). Returning the main
+#    Siemens.Engineering.dll for every request causes "The located assembly's
+#    manifest definition does not match the assembly reference" on
+#    Siemens.Engineering.Contract during the TiaPortalAccess type-initializer.
 $resolverSrc = @"
 using System;
+using System.IO;
 using System.Reflection;
 public static class TiaResolver {
-    public static string DllPath;
-    public static Assembly Resolve(object s, ResolveEventArgs a){
-        if(a.Name.StartsWith("Siemens.Engineering")) return Assembly.LoadFrom(DllPath);
+    private static string LibDir;
+    public static void Register(string dir){
+        LibDir = dir;
+        AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(OnResolve);
+    }
+    private static Assembly OnResolve(object sender, ResolveEventArgs args){
+        int idx = args.Name.IndexOf(',');
+        string name = idx < 0 ? args.Name : args.Name.Substring(0, idx);
+        if (!name.StartsWith("Siemens.")) return null;
+        string path = Path.Combine(LibDir, name + ".dll");
+        if (File.Exists(path)) return Assembly.LoadFrom(path);
         return null;
     }
-    public static void Hook(string p){ DllPath=p; AppDomain.CurrentDomain.AssemblyResolve += Resolve; }
 }
 "@
-Add-Type -TypeDefinition $resolverSrc -Language CSharp
-[TiaResolver]::Hook($DllPath)
+Add-Type -TypeDefinition $resolverSrc
+[TiaResolver]::Register($ApiDir)
 [Reflection.Assembly]::LoadFrom($DllPath) | Out-Null
 Log "DLL loaded: $DllPath"
 
