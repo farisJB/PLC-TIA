@@ -10,3 +10,11 @@
 export/
 device_library/
 TIA Library/
+
+# --- v1.5 TiaSharp build/runtime artifacts ---
+bin/
+obj/
+*.wired.xml
+*.import.xml
+orders/*.txt
+!orders/Openness_order_example_list.txt

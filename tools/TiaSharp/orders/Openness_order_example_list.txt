@@ -1,0 +1,105 @@
+# =====================================================================
+#  TiaSharp ORDER EXAMPLE LIST  (this file is 100% comments - running
+#  'order' on it does nothing, and files with "example" in the name are
+#  never auto-picked)
+# =====================================================================
+#
+#  HOW TO USE
+#   1) Copy a template below into a NEW .txt note in THIS 'orders' folder
+#      (Notepad / Notepad++ / anything), e.g.  orders\myjob.txt
+#   2) Delete the leading '#' of the lines you want and replace the
+#      <placeholders> with your real names.
+#   3) In the TiaSharp shell type:   order myjob      (or just: order
+#      -> picks the newest note;  or: order <full path>)
+#   4) Check the preview, then type  y  (or confirm) to run the lines
+#      top to bottom.
+#
+#  RULES
+#   - '#' lines and blank lines are ignored.
+#   - Lines run EXACTLY as typed in the shell: a WRITE line without the
+#     word 'confirm' only DRY-RUNS. Either append 'confirm' to the line,
+#     or put a bare 'y' on the next line to apply the preview above it.
+#   - 'exit' and 'order' are not allowed inside an order file.
+#   - Nothing is ever auto-saved: Ctrl+S in TIA keeps, closing without
+#     saving reverts. Safety (F) writes need the safety program UNLOCKED.
+#
+# ---------------------------------------------------------------------
+#  READ COMMANDS
+# ---------------------------------------------------------------------
+#
+# --- status: project name + top-level device count
+# status
+#
+# --- listblocks: whole block tree, or scoped to one group
+# listblocks
+# listblocks --group "90 SG90"
+#
+# --- listhardware: all devices (full traversal, de-duped)
+# listhardware
+#
+# --- findaml: search the device library / export folders for AML files
+# findaml <partialName>
+#
+# --- exportblock: block -> SimaticML XML (+ SCL for SCL/STL blocks)
+# exportblock <BLOCK_NAME> --out export\myjob
+#
+# --- exportdevice: device -> AutomationML (.aml) via CaxProvider
+# exportdevice <DEVICE_NAME> --out export\myjob
+#
+# ---------------------------------------------------------------------
+#  WRITE COMMANDS  (dry-run without 'confirm'; never saved)
+# ---------------------------------------------------------------------
+#
+# --- creategroup: ensure a (nested) program-block group exists
+# creategroup <GroupA/GroupB> confirm
+#
+# --- importblock: import one block XML into a group
+#     (--as imports a COPY under a new name; --override replaces)
+# importblock export\myjob\<BLOCK>.xml --group <GroupA> --override confirm
+# importblock export\myjob\<BLOCK>.xml --group <GroupA> --as <NEW_NAME> confirm
+#
+# --- clonedevice: full device clone (AML export -> transform -> import
+#     -> assign to IO system -> set IO addresses). Two source modes:
+# clonedevice <LIVE_TEMPLATE_DEVICE> --as <NEW_DEVICE> --ip <10.x.x.x> --pn <pn-name> --group <DeviceGroup> --iobase <16000> confirm
+# clonedevice --from <library_aml_or_fragment> --as <NEW_DEVICE> --ip <10.x.x.x> --pn <pn-name> --group <DeviceGroup> --iobase <16000> confirm
+#
+# --- createtags: create/complete a tag table (idempotent, read-back)
+#     inline tags; --group puts the TABLE inside a tag-table user group
+# createtags <++STXXX> --tag <NAME>:Bool:%I<addr>.0 --tag <NAME2>:Bool:%Q<addr>.0 confirm
+# createtags <++STXXX> --group <Stations/LineX> --tag <NAME>:Bool:%I<addr>.0 confirm
+#     bulk from CSV (lines: name,type,address):
+# createtags <++STXXX> --file orders\<mytags>.csv confirm
+#     telegram tag typed as a UDT (UDT = the tag's DATA TYPE, start byte .0):
+# createtags <++STXXX> --tag <++STXXX+TD001_IN>:<MY_TELEG_UDT_IN>:%I<addr>.0 --tag <++STXXX+TD001_OUT>:<MY_TELEG_UDT_OUT>:%Q<addr>.0 confirm
+#
+# --- wirefb: repoint operands inside an exported FB XML, then
+#     Override-import it. DB:Member=Tag collapses a DB access to a
+#     global tag; OldTag=NewTag renames a tag operand. A map that
+#     matches nothing ABORTS before import.
+# wirefb export\myjob\<FB>.xml --group <GroupA> --map <FAKE_DB>:<MEMBER>=<GLOBAL_TAG> --map <OLD_TAG>=<NEW_TAG> confirm
+#
+# --- importchain: ordered Override imports (the safety-chain step).
+#     Proven order: standard DBs -> safety DBs -> FFB -> FB.
+#     SAFETY PROGRAM MUST BE UNLOCKED for the F-blocks!
+# importchain --group <GroupA> --files export\myjob\<STD_SDB>.xml,export\myjob\<SAFE_SDB>.xml,export\myjob\<FFB>.xml,export\myjob\<FB>.xml confirm
+#
+# ---------------------------------------------------------------------
+#  VERIFY
+# ---------------------------------------------------------------------
+#
+# --- compile: ONE pass at the highest level (software), optional hardware
+#     (bare compile / --all / --group all mean the same single software pass;
+#      --hw also/only compiles hardware and regenerates F-I/O QBAD DBs)
+# compile
+# compile <BLOCK_NAME>
+# compile --hw
+# compile --hw <DEVICE_NAME>
+# compile --all --hw
+#
+# ---------------------------------------------------------------------
+#  FULL EXAMPLE NOTE (what orders\myjob.txt could look like)
+# ---------------------------------------------------------------------
+# creategroup 90 SG90 confirm
+# createtags ++ST900 --tag SENSOR_ADVANCE_1:Bool:%I17000.0 confirm
+# wirefb export\myjob\MYFIXTURE_FB.xml --group "90 SG90" --map MYFIXTURE_TAGS_DB:SENSOR_ADVANCE_1=SENSOR_ADVANCE_1 confirm
+# compile --group "90 SG90"

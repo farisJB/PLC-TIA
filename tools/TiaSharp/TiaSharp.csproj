@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    TiaSharp - C# port of the V1.0 PowerShell Openness scripts (V1.5).
+    Targets .NET Framework 4.8 because TIA V17 Openness (Siemens.Engineering.dll)
+    is built against .NET Framework and will not load under .NET 6/8.
+    Built/run in VS Code with the .NET SDK + the ".NET Framework 4.8 Developer Pack".
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>TiaSharp</AssemblyName>
+    <RootNamespace>TiaSharp</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      Reference the Openness assembly for COMPILE only (Private=false => not copied).
+      At RUNTIME it (and its Siemens.* dependencies) are loaded by TiaResolver from
+      the API folder. Update the HintPath if the API path differs on this machine.
+    -->
+    <Reference Include="Siemens.Engineering">
+      <HintPath>C:\Program Files\Siemens\Automation\Portal V17\PublicAPI\V17\Siemens.Engineering.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
