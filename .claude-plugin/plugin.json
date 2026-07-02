@@ -1,7 +1,7 @@
 {
   "name": "plc-tia",
-  "version": "0.1.0",
-  "description": "Generate and manipulate Siemens TIA Portal projects via the Openness API and PowerShell 5.1: connect/read/export, clone hardware devices, and scaffold standard + safety (F) block chains. Documented skeleton built from proven recipes; refine against a real project before production use.",
+  "version": "1.5.0",
+  "description": "Generate and manipulate Siemens TIA Portal projects via the Openness API: connect/read/export, clone hardware devices, create tags, wire FBs, and import standard + safety (F) block chains. v1.5 ships TiaSharp, a C# (.NET 4.8) console tool with all recipes as dry-run/confirm subcommands, a persistent attach-once shell, and Notepad 'order' notes; the v1.0 PowerShell scripts remain as reference in the skills. All commands proven live on a real V17 project.",
   "author": "plc-tia",
   "skills": [
     "skills/plc-connect",

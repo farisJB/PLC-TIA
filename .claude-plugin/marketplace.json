@@ -7,8 +7,8 @@
     {
       "name": "plc-tia",
       "source": "./",
-      "version": "0.1.0",
-      "description": "A reusable toolkit for driving Siemens TIA Portal V17 through the Openness API from Windows PowerShell 5.1 — connect/read/export, hardware device cloning, and standard + safety (F) block scaffolding."
+      "version": "1.5.0",
+      "description": "A reusable toolkit for driving Siemens TIA Portal V17 through the Openness API — connect/read/export, device cloning, tag creation, FB wiring and standard + safety (F) chain imports. v1.5: all recipes as the TiaSharp C# console tool (dry-run/confirm, attach-once shell, order notes); PowerShell scripts remain as v1.0 reference."
     }
   ]
 }
